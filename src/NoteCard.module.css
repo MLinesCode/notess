@@ -1,38 +1,70 @@
 .card {
   background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
   position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 .card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-500);
+  transform: translateY(-2px);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 .content {
-  color: #1f2937;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  padding-right: 2rem;
+  color: var(--neutral-900);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding-right: 3rem;
+  word-wrap: break-word;
+  min-height: 24px;
 }
 
 .deleteButton {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: none;
-  border: none;
-  color: #9ca3af;
+  top: 1rem;
+  right: 1rem;
+  background-color: white;
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--radius-sm);
+  color: var(--neutral-400);
   cursor: pointer;
   opacity: 0;
-  transition: all 0.2s;
-  padding: 0.25rem;
+  transition: all var(--transition-base);
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Mostrar siempre en dispositivos táctiles */
+@media (hover: none) {
+  .deleteButton {
+    opacity: 1;
+  }
 }
 
 .card:hover .deleteButton {
@@ -40,10 +72,28 @@
 }
 
 .deleteButton:hover {
-  color: #dc2626;
+  color: var(--error-500);
+  border-color: var(--error-500);
+  background-color: var(--error-500);
+  transform: scale(1.1);
+}
+
+.deleteButton:hover svg {
+  filter: brightness(0) invert(1);
+}
+
+.deleteButton:active {
+  transform: scale(0.95);
+}
+
+.deleteButton:focus-visible {
+  opacity: 1;
+  outline: 3px solid var(--error-500);
+  outline-offset: 2px;
 }
 
 .deleteButton svg {
   width: 1.25rem;
   height: 1.25rem;
+  transition: filter var(--transition-base);
 }

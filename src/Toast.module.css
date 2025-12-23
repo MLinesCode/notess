@@ -1,26 +1,62 @@
 .toast {
   position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  background-color: #1f2937;
+  bottom: 2rem;
+  right: 2rem;
+  background: linear-gradient(135deg, var(--success-500), #059669);
   color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  animation: slideUp 0.3s ease-out;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: slideUpBounce var(--transition-slow) cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 280px;
+  max-width: 90vw;
+  z-index: 100;
+}
+
+@media (max-width: 640px) {
+  .toast {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
 }
 
 .message {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-@keyframes slideUp {
-  from {
+.message::before {
+  content: '✓';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@keyframes slideUpBounce {
+  0% {
     transform: translateY(100%);
     opacity: 0;
   }
-  to {
+  60% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(5px);
+  }
+  100% {
     transform: translateY(0);
     opacity: 1;
   }
