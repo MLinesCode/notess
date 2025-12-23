@@ -1,5 +1,5 @@
 import styles from './NoteCard.module.css'
-import { Note } from './types'
+import type { Note } from './types'
 import { formatNotificationTime } from './services/notifications'
 
 interface NoteCardProps {

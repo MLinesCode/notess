@@ -3,7 +3,8 @@ import NoteCard from './NoteCard'
 import ConfirmModal from './ConfirmModal'
 import Toast from './Toast'
 import { useLocalStorage } from './hooks/useLocalStorage'
-import { Note, NOTIFICATION_TIMES, STORAGE_KEYS } from './types'
+import type { Note } from './types'
+import { NOTIFICATION_TIMES, STORAGE_KEYS } from './types'
 import { 
   ensureNotificationPermission, 
   scheduleNoteNotification,
