@@ -1,9 +1,15 @@
 import { useState } from 'react'
 import NoteCard from './NoteCard'
+import ConfirmModal from './ConfirmModal'
+import Toast from './Toast'
+import styles from './App.module.css'
 
 function App() {
   const [noteInput, setNoteInput] = useState('')
   const [notes, setNotes] = useState<string[]>([])
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [noteToDelete, setNoteToDelete] = useState<number | null>(null)
+  const [showToast, setShowToast] = useState(false)
 
   const handleAddNote = () => {
     if (noteInput.trim()) {
@@ -18,26 +24,45 @@ function App() {
     }
   }
 
+  const handleDeleteClick = (index: number) => {
+    setNoteToDelete(index)
+    setShowConfirmModal(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (noteToDelete !== null) {
+      setNotes(notes.filter((_, index) => index !== noteToDelete))
+      setShowConfirmModal(false)
+      setNoteToDelete(null)
+      setShowToast(true)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setShowConfirmModal(false)
+    setNoteToDelete(null)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto p-6">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
         {/* Header */}
-        <h1 className="text-3xl font-light text-gray-800 mb-8 text-center">Notas</h1>
+        <h1 className={styles.title}>Notas</h1>
         
         {/* Input Section */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
-          <div className="flex gap-3">
+        <div className={styles.inputSection}>
+          <div className={styles.inputContainer}>
             <input
               type="text"
               value={noteInput}
               onChange={(e) => setNoteInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Escribe tu nota..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+              className={styles.input}
             />
             <button
               onClick={handleAddNote}
-              className="px-6 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+              className={styles.button}
             >
               Agregar
             </button>
@@ -45,19 +70,36 @@ function App() {
         </div>
 
         {/* Notes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className={styles.notesGrid}>
           {notes.map((note, index) => (
-            <NoteCard key={index} content={note} />
+            <NoteCard key={index} content={note} onDelete={() => handleDeleteClick(index)} />
           ))}
         </div>
 
         {/* Empty State */}
         {notes.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <p className="text-sm">No hay notas aún. ¡Agrega tu primera nota!</p>
+          <div className={styles.emptyState}>
+            <p>No hay notas aún. ¡Agrega tu primera nota!</p>
           </div>
         )}
       </div>
+
+      {/* Confirm Modal */}
+      {showConfirmModal && (
+        <ConfirmModal
+          message="¿Estás seguro de que deseas eliminar esta nota?"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
+
+      {/* Toast Notification */}
+      {showToast && (
+        <Toast
+          message="Nota eliminada correctamente"
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   )
 }
