@@ -2,11 +2,16 @@ import { useState } from 'react'
 import NoteCard from './NoteCard'
 import ConfirmModal from './ConfirmModal'
 import Toast from './Toast'
+import { useLocalStorage } from './hooks/useLocalStorage'
 import styles from './App.module.css'
+
+// Constante para la clave de localStorage - facilita mantenimiento
+const NOTES_STORAGE_KEY = 'notes-app-data'
 
 function App() {
   const [noteInput, setNoteInput] = useState('')
-  const [notes, setNotes] = useState<string[]>([])
+  // Usar hook personalizado para persistencia automática en localStorage
+  const [notes, setNotes] = useLocalStorage<string[]>(NOTES_STORAGE_KEY, [])
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [noteToDelete, setNoteToDelete] = useState<number | null>(null)
   const [showToast, setShowToast] = useState(false)
