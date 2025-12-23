@@ -1,26 +1,76 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import NoteCard from './NoteCard'
 import ConfirmModal from './ConfirmModal'
 import Toast from './Toast'
 import { useLocalStorage } from './hooks/useLocalStorage'
+import { Note, NOTIFICATION_TIMES, STORAGE_KEYS } from './types'
+import { 
+  ensureNotificationPermission, 
+  scheduleNoteNotification,
+  cancelAllNotifications,
+  isNotificationSupported
+} from './services/notifications'
 import styles from './App.module.css'
-
-// Constante para la clave de localStorage - facilita mantenimiento
-const NOTES_STORAGE_KEY = 'notes-app-data'
 
 function App() {
   const [noteInput, setNoteInput] = useState('')
-  // Usar hook personalizado para persistencia automática en localStorage
-  const [notes, setNotes] = useLocalStorage<string[]>(NOTES_STORAGE_KEY, [])
+  const [selectedTime, setSelectedTime] = useState('09:00') // Hora por defecto: 9AM
+  const [notes, setNotes] = useLocalStorage<Note[]>(STORAGE_KEYS.NOTES, [])
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [noteToDelete, setNoteToDelete] = useState<number | null>(null)
+  const [noteToDelete, setNoteToDelete] = useState<string | null>(null)
   const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
+  
+  // Ref para almacenar los IDs de notificaciones programadas
+  const scheduledNotifications = useRef<Map<string, number>>(new Map())
 
-  const handleAddNote = () => {
-    if (noteInput.trim()) {
-      setNotes([...notes, noteInput])
-      setNoteInput('')
+  // Programar notificaciones cuando se cargan o actualizan las notas
+  useEffect(() => {
+    // Cancelar todas las notificaciones anteriores
+    cancelAllNotifications(Array.from(scheduledNotifications.current.values()))
+    scheduledNotifications.current.clear()
+
+    // Programar notificaciones para cada nota que tenga hora configurada
+    notes.forEach(note => {
+      if (note.notificationTime) {
+        const timeoutId = scheduleNoteNotification(note)
+        if (timeoutId) {
+          scheduledNotifications.current.set(note.id, timeoutId)
+        }
+      }
+    })
+
+    // Cleanup al desmontar
+    return () => {
+      cancelAllNotifications(Array.from(scheduledNotifications.current.values()))
     }
+  }, [notes])
+
+  const handleAddNote = async () => {
+    if (!noteInput.trim()) return
+
+    // Solicitar permiso de notificaciones si hay hora seleccionada
+    if (selectedTime && isNotificationSupported()) {
+      const hasPermission = await ensureNotificationPermission()
+      if (!hasPermission && selectedTime) {
+        setToastMessage('No se pudo activar las notificaciones. Verifica los permisos del navegador.')
+        setShowToast(true)
+      }
+    }
+
+    // Crear nueva nota
+    const newNote: Note = {
+      id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      content: noteInput.trim(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      notificationTime: selectedTime || undefined,
+    }
+
+    setNotes([...notes, newNote])
+    setNoteInput('')
+    setToastMessage('Nota creada correctamente')
+    setShowToast(true)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -29,16 +79,17 @@ function App() {
     }
   }
 
-  const handleDeleteClick = (index: number) => {
-    setNoteToDelete(index)
+  const handleDeleteClick = (noteId: string) => {
+    setNoteToDelete(noteId)
     setShowConfirmModal(true)
   }
 
   const handleConfirmDelete = () => {
     if (noteToDelete !== null) {
-      setNotes(notes.filter((_, index) => index !== noteToDelete))
+      setNotes(notes.filter(note => note.id !== noteToDelete))
       setShowConfirmModal(false)
       setNoteToDelete(null)
+      setToastMessage('Nota eliminada correctamente')
       setShowToast(true)
     }
   }
@@ -56,7 +107,7 @@ function App() {
         
         {/* Input Section */}
         <div className={styles.inputSection}>
-          <div className={styles.inputContainer}>
+          <div className={styles.inputWrapper}>
             <input
               type="text"
               value={noteInput}
@@ -64,20 +115,49 @@ function App() {
               onKeyPress={handleKeyPress}
               placeholder="Escribe tu nota..."
               className={styles.input}
+              aria-label="Contenido de la nota"
             />
-            <button
-              onClick={handleAddNote}
-              className={styles.button}
-            >
-              Agregar
-            </button>
+            <div className={styles.inputContainer}>
+              <div className={styles.selectWrapper}>
+                <label htmlFor="notification-time" className={styles.selectLabel}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={styles.selectIcon}>
+                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                  </svg>
+                  Recordatorio:
+                </label>
+                <select
+                  id="notification-time"
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  className={styles.select}
+                  aria-label="Hora de notificación"
+                >
+                  {NOTIFICATION_TIMES.map((time) => (
+                    <option key={time.value} value={time.value}>
+                      {time.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={handleAddNote}
+                className={styles.button}
+                aria-label="Agregar nota"
+              >
+                Agregar
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Notes Grid */}
         <div className={styles.notesGrid}>
-          {notes.map((note, index) => (
-            <NoteCard key={index} content={note} onDelete={() => handleDeleteClick(index)} />
+          {notes.map((note) => (
+            <NoteCard 
+              key={note.id} 
+              note={note} 
+              onDelete={() => handleDeleteClick(note.id)} 
+            />
           ))}
         </div>
 
@@ -101,7 +181,7 @@ function App() {
       {/* Toast Notification */}
       {showToast && (
         <Toast
-          message="Nota eliminada correctamente"
+          message={toastMessage}
           onClose={() => setShowToast(false)}
         />
       )}

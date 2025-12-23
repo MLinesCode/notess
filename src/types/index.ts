@@ -14,7 +14,18 @@ export interface Note {
   content: string;
   createdAt: number;
   updatedAt: number;
+  notificationTime?: string; // Hora en formato "HH:MM" para notificación diaria (ej: "09:00")
 }
+
+/**
+ * Horarios predeterminados para notificaciones
+ */
+export const NOTIFICATION_TIMES = [
+  { value: '09:00', label: '9:00 AM' },
+  { value: '10:00', label: '10:00 AM' },
+  { value: '11:00', label: '11:00 AM' },
+  { value: '', label: 'Sin notificación' },
+] as const;
 
 /**
  * Configuración de localStorage

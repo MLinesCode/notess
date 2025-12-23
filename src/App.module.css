@@ -45,6 +45,12 @@
   border-color: var(--primary-500);
 }
 
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .inputContainer {
   display: flex;
   flex-direction: column;
@@ -55,6 +61,7 @@
   .inputContainer {
     flex-direction: row;
     gap: 1rem;
+    align-items: center;
   }
 }
 
@@ -84,6 +91,68 @@
   border-color: var(--primary-500);
   box-shadow: 0 0 0 3px var(--primary-100);
   background-color: var(--primary-50);
+}
+
+.selectWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.selectLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--neutral-600);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.selectIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--primary-500);
+  flex-shrink: 0;
+}
+
+.select {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--neutral-900);
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-base);
+  min-height: 44px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5rem;
+  padding-right: 2.5rem;
+}
+
+.select:hover {
+  border-color: var(--neutral-400);
+}
+
+.select:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+@media (min-width: 640px) {
+  .selectWrapper {
+    flex: 0 1 auto;
+    min-width: 200px;
+  }
 }
 
 .button {
