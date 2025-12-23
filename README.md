@@ -6,7 +6,10 @@ Aplicación moderna de notas con notificaciones programables, construida con Rea
 
 - ✅ **Crear y eliminar notas** con interfaz intuitiva
 - ✅ **Notificaciones programables** (9AM, 10AM, 11AM o sin notificación)
+- ✅ **PWA (Progressive Web App)** - Instalar en iOS/Android
+- ✅ **Notificaciones en iOS** cuando se instala como PWA
 - ✅ **Persistencia de datos** con localStorage
+- ✅ **Funciona offline** con Service Worker
 - ✅ **Diseño accesible** (WCAG 2.1 AA)
 - ✅ **Responsive** - Mobile-first design
 - ✅ **Confirmación de eliminación** para prevenir errores
@@ -76,6 +79,7 @@ src/
 
 ## 📚 Documentación
 
+- [**PWA_GUIDE.md**](PWA_GUIDE.md) - Guía completa de PWA y notificaciones iOS
 - [**DESIGN_SYSTEM.md**](DESIGN_SYSTEM.md) - Sistema de diseño y guías de estilo
 - [**STORAGE_SYSTEM.md**](STORAGE_SYSTEM.md) - Arquitectura de persistencia
 - [**NOTIFICATIONS_SYSTEM.md**](NOTIFICATIONS_SYSTEM.md) - Sistema de notificaciones
@@ -97,6 +101,17 @@ Las notificaciones utilizan la **Notifications API** del navegador:
 2. Programa recordatorios diarios a la hora seleccionada
 3. Se reprograman automáticamente cada día
 4. Persisten después de recargar la página
+
+### 📱 iOS Safari
+**Importante:** En iOS, las notificaciones solo funcionan cuando la app está **instalada como PWA**:
+
+1. Abre la app en Safari iOS
+2. Toca el botón **Compartir**
+3. Selecciona **"Agregar a pantalla de inicio"**
+4. Abre la app desde la pantalla de inicio
+5. Ahora sí funcionarán las notificaciones ✅
+
+Ver [PWA_GUIDE.md](PWA_GUIDE.md) para más detalles.
 
 **Nota**: En producción, las notificaciones requieren HTTPS.
 

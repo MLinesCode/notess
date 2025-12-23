@@ -3,6 +3,7 @@ import NoteCard from './NoteCard'
 import ConfirmModal from './ConfirmModal'
 import Toast from './Toast'
 import { useLocalStorage } from './hooks/useLocalStorage'
+import { usePWA } from './hooks/usePWA'
 import type { Note } from './types'
 import { NOTIFICATION_TIMES, STORAGE_KEYS } from './types'
 import { 
@@ -14,6 +15,9 @@ import {
 import styles from './App.module.css'
 
 function App() {
+  // Registrar Service Worker para PWA (iOS Safari requiere instalación)
+  usePWA()
+  
   const [noteInput, setNoteInput] = useState('')
   const [selectedTime, setSelectedTime] = useState('09:00') // Hora por defecto: 9AM
   const [notes, setNotes] = useLocalStorage<Note[]>(STORAGE_KEYS.NOTES, [])
